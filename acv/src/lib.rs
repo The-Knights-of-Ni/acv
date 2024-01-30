@@ -1,17 +1,18 @@
-use std::rc::Rc;
-use image::{GrayImage, Luma, Rgb, Rgba};
+use std::sync::{Arc, Mutex};
+use image::{GrayImage, Luma, Rgb};
 pub use imageproc::definitions::Image;
 pub use error::Error;
 pub use imageproc;
+use tokio::sync::oneshot::Receiver;
 
 pub mod error;
 
 type Result<T> = std::result::Result<T, Error>;
 
-struct Hsv {
-    h: f32,
-    s: f32,
-    v: f32,
+pub struct Hsv {
+    pub h: f32,
+    pub s: f32,
+    pub v: f32,
 }
 
 impl From<Rgb<u8>> for Hsv {
@@ -74,5 +75,35 @@ pub trait Pipeline {
         3
     }
 
-    fn pipeline(&self, input: Image<Rgb<u8>>) -> Result<Option<Image<Rgb<u8>>>>;
+    fn pipeline(&mut self, input: Image<Rgb<u8>>) -> Result<Option<Image<Rgb<u8>>>>;
+}
+
+pub struct Camera {
+    pub width: u32,
+    pub height: u32,
+    pub pipeline: Option<Arc<Mutex<dyn Pipeline>>>,
+}
+
+impl Camera {
+    pub fn new(width: u32, height: u32) -> Self {
+        Camera {
+            width,
+            height,
+            pipeline: None,
+        }
+    }
+
+    pub fn set_pipeline(&mut self, pipeline: Option<Arc<Mutex<dyn Pipeline>>>) {
+        self.pipeline = pipeline;
+    }
+
+    pub async fn run(mut receiver: Receiver<()>) {
+        let (w_sender, w_receiver) = tokio::sync::watch::channel(());
+        // let task = tokio::task::spawn();
+        loop {
+            if receiver.try_recv().is_ok() {
+                break;
+            }
+        }
+    }
 }

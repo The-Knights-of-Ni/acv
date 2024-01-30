@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    "acv",
+    "acv", "camera"
 ]
 
 [patch.crates-io]

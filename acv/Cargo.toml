@@ -6,6 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+camera = { path = "../camera" }
 cv = "0.6"
 image = "0.24"
 imageproc = "0.23"
+tokio = { version = "1.13", features = ["full"] }
