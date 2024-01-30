@@ -1,0 +1,53 @@
+[package]
+name = "imageproc"
+version = "0.23.0"
+authors = ["theotherphil"]
+edition = "2021"
+license = "MIT"
+description = "Image processing operations"
+readme = "README.md"
+repository = "https://github.com/image-rs/imageproc.git"
+homepage = "https://github.com/image-rs/imageproc"
+exclude = ["examples/*.ttf"]
+
+[features]
+default = [ "rayon" ]
+property-testing = [ "quickcheck" ]
+display-window = ["sdl2"]
+
+[dependencies]
+approx = "0.5"
+conv = "0.3.3"
+image = { version = "0.24.6", default-features = false }
+itertools = "0.10"
+nalgebra = { version = "0.32", default-features = false, features = ["std"] }
+num = "0.4"
+rand = "0.8.5"
+rand_distr = "0.4.3"
+rusttype = "0.9.3"
+rayon = { version = "1.7.0", optional = true }
+quickcheck = { version = "1.0.3", optional = true }
+sdl2 = { version = "0.35", optional = true, default-features = false, features = ["bundled"] }
+
+[dev-dependencies]
+assert_approx_eq = "1.1.0"
+image = "0.24.6"
+quickcheck = "1.0.3"
+wasm-bindgen-test = "0.3.35"
+
+[package.metadata.docs.rs]
+# See https://github.com/image-rs/imageproc/issues/358
+# all-features = true
+features = [ "property-testing" ]
+
+[profile.release]
+opt-level = 3
+debug = true
+
+[profile.bench]
+opt-level = 3
+debug = true
+rpath = false
+lto = false
+debug-assertions = false
+codegen-units = 1
