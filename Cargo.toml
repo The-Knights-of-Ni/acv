@@ -1,0 +1,8 @@
+[workspace]
+resolver = "2"
+members = [
+    "acv",
+]
+
+[patch.crates-io]
+bitarray = { path = "bitarray" }
