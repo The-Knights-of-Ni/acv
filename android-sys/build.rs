@@ -2,7 +2,7 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() {
-    let sys_root_path = PathBuf::from("C:/Users/ariha/AppData/Local/Android/Sdk/ndk/26.0.10792818/toolchains/llvm/prebuilt/windows-x86_64/sysroot");
+    let sys_root_path = PathBuf::from("/opt/android/ndk/26.0.10792818/toolchains/llvm/prebuilt/linux-x86_64/sysroot");
     let include_dir_path = sys_root_path.join("usr").join("include")
         // Canonicalize the path as `rustc-link-search` requires an absolute
         // path.
@@ -43,5 +43,8 @@ fn main() {
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap()).join("bindings.rs");
     bindings
         .write_to_file(out_path)
+        .expect("Couldn't write bindings!");
+    bindings
+        .write_to_file(PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("src").join("bindings.rs"))
         .expect("Couldn't write bindings!");
 }

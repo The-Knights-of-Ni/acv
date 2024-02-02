@@ -78,15 +78,15 @@ pub trait Pipeline {
     fn pipeline(&mut self, input: Image<Rgb<u8>>) -> Result<Option<Image<Rgb<u8>>>>;
 }
 
-pub struct Camera {
+pub struct SinglePipelineCamera {
     pub width: u32,
     pub height: u32,
     pub pipeline: Option<Arc<Mutex<dyn Pipeline>>>,
 }
 
-impl Camera {
+impl SinglePipelineCamera {
     pub fn new(width: u32, height: u32) -> Self {
-        Camera {
+        SinglePipelineCamera {
             width,
             height,
             pipeline: None,
@@ -101,9 +101,9 @@ impl Camera {
         let (w_sender, w_receiver) = tokio::sync::watch::channel(());
         // let task = tokio::task::spawn();
         loop {
-            if receiver.try_recv().is_ok() {
-                break;
-            }
+            // if receiver.try_recv().is_ok() {
+            //     break;
+            // }
         }
     }
 }
