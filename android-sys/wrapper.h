@@ -1,3 +1,4 @@
+#include "android/log.h"
 #include "android/native_activity.h"
 #include "android/native_window_jni.h"
 #include "android/native_window.h"

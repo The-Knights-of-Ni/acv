@@ -4,8 +4,10 @@ pub use imageproc::definitions::Image;
 pub use error::Error;
 pub use imageproc;
 use tokio::sync::oneshot::Receiver;
+use crate::frame_generator::FrameGenerator;
 
 pub mod error;
+pub mod frame_generator;
 
 type Result<T> = std::result::Result<T, Error>;
 
@@ -82,14 +84,16 @@ pub struct SinglePipelineCamera {
     pub width: u32,
     pub height: u32,
     pub pipeline: Option<Arc<Mutex<dyn Pipeline>>>,
+    pub camera: Arc<Box<dyn FrameGenerator>>
 }
 
 impl SinglePipelineCamera {
-    pub fn new(width: u32, height: u32) -> Self {
+    pub fn new(width: u32, height: u32, camera: Arc<Box<dyn FrameGenerator>>) -> Self {
         SinglePipelineCamera {
             width,
             height,
             pipeline: None,
+            camera
         }
     }
 

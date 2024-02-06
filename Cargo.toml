@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    "acv", "android-sys", "camera"
+    "acv", "android", "android-sys", "camera"
 ]
 
 [patch.crates-io]
