@@ -165,9 +165,9 @@ impl From<ACameraManager> for CameraManager {
     }
 }
 
-struct CameraDevice {
+pub struct CameraDevice {
     device: ACameraDevice,
-    manager: CameraManager
+    pub manager: CameraManager
 }
 
 impl CameraDevice {
@@ -202,7 +202,7 @@ impl CameraDevice {
         &self.manager
     }
 
-    fn close(mut self) {
+    pub fn close(mut self) {
         unsafe {
             ACameraDevice_close(&mut self.device);
         }
@@ -274,7 +274,7 @@ pub struct CaptureRequest {
 impl CaptureRequest {
     pub fn new(device: &CameraDevice, request_template: RequestTemplate) -> Self {
         unsafe {
-            let mut request = std::ptr::null_mut();
+            let request = std::ptr::null_mut();
             ACameraDevice_createCaptureRequest(device.as_raw(), request_template as isize as ACameraDevice_request_template, request);
             Self {
                 request: **request
@@ -317,7 +317,7 @@ impl CameraCaptureSession {
                 onError: None,
             };
             let mut device = CameraDevice::new(camera_id, &mut device_callback)?;
-            let mut session = std::ptr::null_mut();
+            let session = std::ptr::null_mut();
             let output = CaptureSessionOutputContainer::new();
             let resp = ACameraDevice_createCaptureSession(device.as_raw_mut(), output.as_raw(), &callback, session);
             if resp != 0 {

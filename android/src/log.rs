@@ -1,6 +1,6 @@
 use android_sys::{__android_log_print, android_LogPriority_ANDROID_LOG_UNKNOWN, android_LogPriority_ANDROID_LOG_DEBUG, android_LogPriority_ANDROID_LOG_INFO, android_LogPriority_ANDROID_LOG_WARN, android_LogPriority_ANDROID_LOG_ERROR};
 
-enum LogPriority {
+pub enum LogPriority {
     Unknown = android_LogPriority_ANDROID_LOG_UNKNOWN as isize,
     Debug = android_LogPriority_ANDROID_LOG_DEBUG as isize,
     Info = android_LogPriority_ANDROID_LOG_INFO as isize,

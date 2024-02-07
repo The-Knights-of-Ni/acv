@@ -1,9 +1,10 @@
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
+use tokio::sync::Mutex;
 use image::{GrayImage, Luma, Rgb};
 pub use imageproc::definitions::Image;
 pub use error::Error;
 pub use imageproc;
-use tokio::sync::oneshot::Receiver;
+use log::error;
 use crate::frame_generator::FrameGenerator;
 
 pub mod error;
@@ -84,11 +85,11 @@ pub struct SinglePipelineCamera {
     pub width: u32,
     pub height: u32,
     pub pipeline: Option<Arc<Mutex<dyn Pipeline>>>,
-    pub camera: Arc<Box<dyn FrameGenerator>>
+    pub camera: Arc<Mutex<dyn FrameGenerator>>
 }
 
 impl SinglePipelineCamera {
-    pub fn new(width: u32, height: u32, camera: Arc<Box<dyn FrameGenerator>>) -> Self {
+    pub fn new(width: u32, height: u32, camera: Arc<Mutex<dyn FrameGenerator>>) -> Self {
         SinglePipelineCamera {
             width,
             height,
@@ -101,13 +102,26 @@ impl SinglePipelineCamera {
         self.pipeline = pipeline;
     }
 
-    pub async fn run(mut receiver: Receiver<()>) {
-        let (w_sender, w_receiver) = tokio::sync::watch::channel(());
-        // let task = tokio::task::spawn();
+    pub async fn run(&mut self, streamer: Option<tokio::sync::broadcast::Sender<Image<Rgb<u8>>>>) {
         loop {
-            // if receiver.try_recv().is_ok() {
-            //     break;
-            // }
+            let frame = self.camera.lock().await.frame();
+            if let Ok(frame) = frame {
+                if let Some(pipeline) = &self.pipeline {
+                    let mut pipeline = pipeline.lock().await;
+                    let pipeline_result = pipeline.pipeline(frame);
+                    if let Ok(frame_option) = pipeline_result {
+                        if let Some(frame) = frame_option {
+                            if let Some(streamer) = &streamer {
+                                let _ = streamer.send(frame);
+                            }
+                        }
+                    } else {
+                        error!("Pipeline error")
+                    }
+                }
+            } else {
+                error!("Frame error")
+            }
         }
     }
 }

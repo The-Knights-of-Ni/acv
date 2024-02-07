@@ -5,14 +5,14 @@ pub struct NativeWindow {
 }
 
 impl NativeWindow {
-    pub fn new(env: &mut JNIEnv, surface: jobject) -> Self {
+    pub fn new(env: &mut JNIEnv, surface: jobject) -> Option<Self> {
         unsafe {
             let window = ANativeWindow_fromSurface(env, surface);
             if window.is_null() {
-                panic!("ANativeWindow_fromSurface failed");
+                return None;
             }
             let window = Self { window };
-            window
+            Some(window)
         }
     }
 
@@ -22,5 +22,13 @@ impl NativeWindow {
 
     pub unsafe fn as_ptr(&self) -> *const ANativeWindow {
         self.window
+    }
+}
+
+impl Drop for NativeWindow {
+    fn drop(&mut self) {
+        unsafe {
+            ANativeWindow_release(self.window);
+        }
     }
 }

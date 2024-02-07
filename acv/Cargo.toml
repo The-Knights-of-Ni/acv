@@ -10,7 +10,8 @@ camera = { path = "../camera", optional = true }
 cv = "0.6"
 image = "0.24"
 imageproc = "0.23"
-tokio = { version = "1.13", features = ["full"] }
+tokio = { version = "1.36", features = ["full"] }
+log = "0.4"
 robusta_jni = { version = "0.2", optional = true }
 
 [features]

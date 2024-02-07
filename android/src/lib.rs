@@ -2,4 +2,4 @@ pub mod camera;
 pub mod media;
 
 pub mod log;
-mod native_activity;
+pub mod native_activity;
