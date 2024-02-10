@@ -28,12 +28,12 @@ impl FrameGenerator for JNIFrameGenerator<'_> {
             // Pointer Transmutation (we know it's a byte array)
             std::mem::transmute(array.into_inner())
         };
-        let mut vec_array: Vec<u8> = self.env.convert_byte_array(jni_array.to_owned()).unwrap();
-        let width = u32::from_be_bytes([vec_array[0], vec_array[1], vec_array[2], vec_array[3]]);
-        let height = u32::from_be_bytes([vec_array[4], vec_array[5], vec_array[6], vec_array[7]]);
-        vec_array.drain(0..8);
-        // TODO: Fix width and height
-        let image = Image::from_raw(width, height, vec_array).ok_or("Failed to create image from raw data")?;
+        let width_object = self.env.get_field(self.class, "width", "I").unwrap();
+        let width = width_object.i().unwrap();
+        let height_object = self.env.get_field(self.class, "height", "I").unwrap();
+        let height = height_object.i().unwrap();
+        let data = self.env.convert_byte_array(jni_array).unwrap();
+        let image = Image::from_raw(width as u32, height as u32, data).ok_or("Failed to create image from raw data")?;
         Ok(image)
     }
 }

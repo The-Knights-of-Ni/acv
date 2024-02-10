@@ -1,5 +1,5 @@
+#[cfg(feature = "camera")]
 pub mod camera;
-pub mod media;
-
+#[cfg(feature = "logging")]
 pub mod log;
-pub mod native_activity;
+pub mod native_window;

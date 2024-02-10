@@ -16,6 +16,23 @@ impl NativeWindow {
         }
     }
 
+    pub fn get_format(&self) -> Result<i32, i32> {
+        let resp = unsafe { ANativeWindow_getFormat(self.window) };
+        if resp < 0 {
+            Err(resp)
+        } else {
+            Ok(resp) // TODO: Convert to enum
+        }
+    }
+
+    pub fn get_width(&self) -> i32 {
+        unsafe { ANativeWindow_getWidth(self.window) }
+    }
+
+    pub fn get_height(&self) -> i32 {
+        unsafe { ANativeWindow_getHeight(self.window) }
+    }
+
     pub unsafe fn as_mut_ptr(&mut self) -> *mut ANativeWindow {
         self.window
     }

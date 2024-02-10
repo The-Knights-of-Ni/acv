@@ -196,7 +196,7 @@ impl CaptureSessionOutputContainer {
         }
     }
 
-    fn add(&mut self, output: CaptureSessionOutput) -> Result<(), CameraError> {
+    pub fn add(&mut self, output: CaptureSessionOutput) -> Result<(), CameraError> {
         unsafe {
             let status = ACaptureSessionOutputContainer_add(self.as_raw_mut(), output.as_raw());
             if status != 0 {
@@ -206,7 +206,7 @@ impl CaptureSessionOutputContainer {
         }
     }
 
-    fn remove(&mut self, output: CaptureSessionOutput) -> Result<(), CameraError> {
+    pub fn remove(&mut self, output: CaptureSessionOutput) -> Result<(), CameraError> {
         unsafe {
             let status = ACaptureSessionOutputContainer_remove(self.as_raw_mut(), output.as_raw());
             if status != 0 {

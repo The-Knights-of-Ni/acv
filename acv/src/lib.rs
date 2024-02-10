@@ -5,11 +5,16 @@ pub use imageproc::definitions::Image;
 pub use error::Error;
 pub use imageproc;
 use log::error;
+use output::Output;
+use pipeline::Pipeline;
 use crate::frame_generator::FrameGenerator;
 
 pub mod error;
 pub mod frame_generator;
+mod output;
+mod pipeline;
 
+// TODO: Differentiate between the different types of errors
 type Result<T> = std::result::Result<T, Error>;
 
 pub struct Hsv {
@@ -72,19 +77,11 @@ pub fn in_range_rgb(src: &Image<Rgb<u8>>, lower: Rgb<u8>, higher: Rgb<u8>, dst: 
     }
 }
 
-pub trait Pipeline {
-    /// The number of samples to run the pipeline.
-    fn num_samples(&self) -> usize {
-        3
-    }
-
-    fn pipeline(&mut self, input: Image<Rgb<u8>>) -> Result<Option<Image<Rgb<u8>>>>;
-}
-
 pub struct SinglePipelineCamera {
     pub width: u32,
     pub height: u32,
     pub pipeline: Option<Arc<Mutex<dyn Pipeline>>>,
+    pub output: Arc<Mutex<dyn Output>>,
     pub camera: Arc<Mutex<dyn FrameGenerator>>
 }
 
@@ -94,6 +91,7 @@ impl SinglePipelineCamera {
             width,
             height,
             pipeline: None,
+            output: Arc::new(Mutex::new(output::NoOutput::default())),
             camera
         }
     }
@@ -102,25 +100,32 @@ impl SinglePipelineCamera {
         self.pipeline = pipeline;
     }
 
-    pub async fn run(&mut self, streamer: Option<tokio::sync::broadcast::Sender<Image<Rgb<u8>>>>) {
+    pub fn set_output(&mut self, output: Option<Arc<Mutex<dyn Output>>>) {
+        if let Some(output) = output {
+            self.output = output;
+        } else {
+            self.output = Arc::new(Mutex::new(output::NoOutput::default()));
+        }
+    }
+
+    pub async fn run(&mut self) {
         loop {
-            let frame = self.camera.lock().await.frame();
-            if let Ok(frame) = frame {
-                if let Some(pipeline) = &self.pipeline {
-                    let mut pipeline = pipeline.lock().await;
-                    let pipeline_result = pipeline.pipeline(frame);
-                    if let Ok(frame_option) = pipeline_result {
-                        if let Some(frame) = frame_option {
-                            if let Some(streamer) = &streamer {
-                                let _ = streamer.send(frame);
-                            }
+            let frame_result = self.camera.lock().await.frame();
+            match frame_result {
+                Ok(frame) => {
+                    if let Some(pipeline) = &self.pipeline {
+                        let mut pipeline = pipeline.lock().await;
+                        let frame = pipeline.pipeline(frame);
+                        let mut output_sender = self.output.lock().await;
+                        let output_result = output_sender.output(frame);
+                        if let Err(e) = output_result {
+                            error!("Error sending output: {}", e);
                         }
-                    } else {
-                        error!("Pipeline error")
                     }
+                },
+                Err(e) => {
+                    error!("Error getting frame from camera: {}", e);
                 }
-            } else {
-                error!("Frame error")
             }
         }
     }

@@ -8,13 +8,15 @@ edition = "2021"
 [dependencies]
 camera = { path = "../camera", optional = true }
 cv = "0.6"
-image = "0.24"
+image = { version = "0.24", features = ["jpeg"] }
 imageproc = "0.23"
 tokio = { version = "1.36", features = ["full"] }
 log = "0.4"
 robusta_jni = { version = "0.2", optional = true }
+clap = { version = "4.5.0", features = ["derive"] }
 
 [features]
-default = ["camera-jni"]
+default = ["camera-jni", "output-unix-socket"]
 camera-jni = ["robusta_jni"]
 camera-ndk = ["camera"]
+output-unix-socket = ["image/png", "image/webp"]
