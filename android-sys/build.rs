@@ -1,4 +1,5 @@
 use std::{env, io};
+use std::fmt::format;
 use std::path::PathBuf;
 
 fn main() -> Result<(), io::Error> { // TODO: use jni-sys for jni.h

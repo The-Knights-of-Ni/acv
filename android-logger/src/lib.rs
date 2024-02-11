@@ -26,7 +26,7 @@
 //! 12-25 12:00:00.000  1234  1234 E MyApp: Nothing more to say
 
 // TODO: Add support for auto-generated tags
-use log::{Log, Level, LevelFilter, Metadata, Record, SetLoggerError};
+use log::{Log, Level, Metadata, Record, SetLoggerError};
 use android::log::{log, LogPriority};
 
 /// `AndroidLogger` is the implementation of the logger.
@@ -83,12 +83,14 @@ impl AndroidLogger {
         LogBuilder::new(tag).build()
     }
 
+    fn max_level(&self) -> log::LevelFilter {
+        log::LevelFilter::max()
+    }
+
     /// Initializes the global logger with `self`
     pub fn init(self) -> Result<(), SetLoggerError> {
-        log::set_logger(|max_level| {
-            max_level.set(LevelFilter::max());
-            Box::new(self)
-        })
+        log::set_max_level(self.max_level());
+        log::set_boxed_logger(Box::new(self))
     }
 }
 
@@ -102,7 +104,7 @@ impl Log for AndroidLogger {
             return;
         }
 
-        let format = String::from((self.format)(record)).unwrap();
+        let format = String::from((self.format)(record));
 
         let prio = match record.level() {
             Level::Error => LogPriority::Error,
@@ -125,7 +127,7 @@ impl LogBuilder {
         LogBuilder {
             tag: tag.into(),
             format: Box::new(|record: &Record| {
-                format!("{}: {}", record.location().module_path(), record.args())
+                format!("{:?}: {}", record.module_path(), record.args())
             }),
         }
     }
@@ -136,11 +138,6 @@ impl LogBuilder {
     {
         self.format = Box::new(format);
         self
-    }
-
-    /// Builds an `AndroidLogger` and initializes the global logger
-    pub fn init(self) -> Result<(), SetLoggerError> {
-        self.build().init()
     }
 
     /// Builds an `AndroidLogger`

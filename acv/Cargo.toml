@@ -3,6 +3,10 @@ name = "acv"
 version = "0.1.0"
 edition = "2021"
 
+# Must use cdylib to be able to use JNI TODO: Test dylib at some point
+[lib]
+crate-type = ["cdylib"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -11,12 +15,14 @@ cv = "0.6"
 image = { version = "0.24", features = ["jpeg"] }
 imageproc = "0.23"
 tokio = { version = "1.36", features = ["full"] }
-log = "0.4"
-robusta_jni = { version = "0.2", optional = true }
+log = { version = "0.4", features = ["std"] }
+jni = { version = "0.21", optional = true }
 clap = { version = "4.5.0", features = ["derive"] }
 
 [features]
-default = ["camera-jni", "output-unix-socket"]
-camera-jni = ["robusta_jni"]
+default = ["camera-jni", "output-unix-stream"]
+camera-jni = ["jni"]
 camera-ndk = ["camera"]
-output-unix-socket = ["image/png", "image/webp"]
+input-jni = ["camera-jni"]
+output-udp = []
+output-unix-stream = ["image/png", "image/webp"]

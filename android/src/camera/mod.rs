@@ -1,6 +1,4 @@
-use std::error::Error;
 use std::ffi::c_char;
-use std::fmt::{Debug, Display};
 use android_sys::*;
 pub use error::CameraError;
 

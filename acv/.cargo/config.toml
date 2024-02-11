@@ -1,2 +1,8 @@
-[env]
-PKG_CONFIG_PATH = "D:/Documents/Programming/acv/libusb"
+[target.aarch64-linux-android]
+linker = "/opt/android/ndk/26.0.10792818/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android-clang"
+
+[target.armv7-linux-androideabi]
+linker = "/opt/android/ndk/26.0.10792818/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi25-clang"
+
+[target.i686-linux-android]
+linker = "/opt/android/ndk/26.0.10792818/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android-clang"
