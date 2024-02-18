@@ -2,7 +2,7 @@
 resolver = "2"
 members = [
     "acv", "android", "android-logger", "android-sys", "camera"
-]
+, "opencv-rs"]
 
 [patch.crates-io]
 bitarray = { path = "bitarray" }

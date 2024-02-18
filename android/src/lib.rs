@@ -1,3 +1,4 @@
+pub mod api_level;
 #[cfg(feature = "camera")]
 pub mod camera;
 #[cfg(feature = "logging")]
